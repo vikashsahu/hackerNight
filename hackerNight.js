@@ -4,7 +4,10 @@ function retrieve() {
 	//reference to top stories, version 0 of the HN api
 	var HNRef = new Firebase("https://hacker-news.firebaseio.com/v0/topstories");
 	var baseItemURL = "http://hacker-news.firebaseio.com/v0/item/";
-	var titleStr = "";
+	var titleStr;
+	var scoreStr;
+	var linkUrl;
+	var baseUserURL = "http://news.ycombinator.com/user?id=";
 	
 	//item source
 	//"https://hacker-news.firebaseio.com/item/""
@@ -20,17 +23,28 @@ function retrieve() {
 			ItemRef.on('child_added', function(itemSnapshot) {
 				//need to display relevant information for each story, a la news.ycombinator.com
 				if (itemSnapshot.key() == "title") {
-					//console.log("title");
 					titleStr = itemSnapshot.val().toString();
-					//document.write(titleStr);
-					//document.write("<br>");
-					//document.write(itemSnapshot.val());
 				}
 				if (itemSnapshot.key() == "url") {
-					//console.log("url");
+					linkUrl = itemSnapshot.val();
+					//document.write(titleStr.link(itemSnapshot.val()));
+					//document.write(scoreStr + " points");
+					//document.write("<br>");
+
 					document.write(titleStr.link(itemSnapshot.val()));
 					document.write("<br>");
+					document.write(scoreStr + " points by " + byStr.link(baseUserURL + byStr));
+					document.write("<br>");
+					document.write("<br>");
 				}
+				if (itemSnapshot.key() == "score") {
+					scoreStr = itemSnapshot.val().toString();
+				}
+				if (itemSnapshot.key() == "by") {
+					byStr = itemSnapshot.val().toString();
+				}
+
+
 			});
 		});
 
