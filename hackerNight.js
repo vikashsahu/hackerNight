@@ -8,6 +8,13 @@ function retrieve() {
 	var scoreStr;
 	var linkUrl;
 	var baseUserURL = "http://news.ycombinator.com/user?id=";
+	var postTimeUnix;
+	var hours=0;
+	var minutes;
+	var seconds;
+	var postCount=1;
+
+	var outputArea = document.getElementById("output-area");
 	
 	//item source
 	//"https://hacker-news.firebaseio.com/item/""
@@ -27,13 +34,15 @@ function retrieve() {
 				}
 				if (itemSnapshot.key() == "url") {
 					linkUrl = itemSnapshot.val();
-					//document.write(titleStr.link(itemSnapshot.val()));
-					//document.write(scoreStr + " points");
-					//document.write("<br>");
-
+					//outputArea.appendChild(document.createTextNode(titleStr));
+					//titleStr.link(itemSnapshot.val());
+					//outputArea.appendChild(document.createTextNode("\n"));
+					document.write(postCount.toString() + ". ");
+					postCount+=1;
 					document.write(titleStr.link(itemSnapshot.val()));
 					document.write("<br>");
 					document.write(scoreStr + " points by " + byStr.link(baseUserURL + byStr));
+					document.write(" | " + hours + "hours " + minutes + "minutes " + seconds + "seconds");
 					document.write("<br>");
 					document.write("<br>");
 				}
@@ -43,7 +52,13 @@ function retrieve() {
 				if (itemSnapshot.key() == "by") {
 					byStr = itemSnapshot.val().toString();
 				}
-
+				if (itemSnapshot.key() == "time") {
+					postTimeUnix = itemSnapshot.val();
+					var date = new Date(postTimeUnix * 1000);
+					hours = date.getHours();
+					minutes = "0" + date.getMinutes();
+					seconds = "0" + date.getSeconds();
+				}
 
 			});
 		});
