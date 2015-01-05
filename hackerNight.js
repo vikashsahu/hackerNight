@@ -8,6 +8,7 @@ function retrieve() {
 	var scoreStr;
 	var linkUrl;
 	var baseUserURL = "http://news.ycombinator.com/user?id=";
+	var baseCommentsURL = "http://news.ycombinator.com/item?id=";
 	var postTimeUnix;
 	var hours=0;
 	var minutes;
@@ -19,47 +20,44 @@ function retrieve() {
 	//item source
 	//"https://hacker-news.firebaseio.com/item/""
 
-	HNRef.on("value", function(dataSnapshot) {
+	HNRef.once("value", function(dataSnapshot) {
 		//dataSnapshot contains IDs of the top 100 stories
 
 		//for each story ID, retrieve corresponding object
 		dataSnapshot.forEach(function(childSnapshot) {
-
+			//console.log(childSnapshot.val());
 			var itemString = baseItemURL + childSnapshot.val();
 			var ItemRef = new Firebase(itemString);
-			ItemRef.on('child_added', function(itemSnapshot) {
-				//need to display relevant information for each story, a la news.ycombinator.com
-				if (itemSnapshot.key() == "title") {
-					titleStr = itemSnapshot.val().toString();
-				}
-				if (itemSnapshot.key() == "url") {
-					linkUrl = itemSnapshot.val();
-					//outputArea.appendChild(document.createTextNode(titleStr));
-					//titleStr.link(itemSnapshot.val());
-					//outputArea.appendChild(document.createTextNode("\n"));
-					document.write(postCount.toString() + ". ");
-					postCount+=1;
-					document.write(titleStr.link(itemSnapshot.val()));
-					document.write("<br>");
-					document.write(scoreStr + " points by " + byStr.link(baseUserURL + byStr));
-					document.write(" | " + hours + "hours " + minutes + "minutes " + seconds + "seconds");
-					document.write("<br>");
-					document.write("<br>");
-				}
-				if (itemSnapshot.key() == "score") {
-					scoreStr = itemSnapshot.val().toString();
-				}
-				if (itemSnapshot.key() == "by") {
-					byStr = itemSnapshot.val().toString();
-				}
-				if (itemSnapshot.key() == "time") {
-					postTimeUnix = itemSnapshot.val();
+			ItemRef.once("value", function(itemSnapshot) {
+					titleStr = itemSnapshot.val().title.toString();
+					linkUrl = itemSnapshot.val().url;
+					scoreStr = itemSnapshot.val().score.toString();
+					byStr = itemSnapshot.val().by.toString();
+					postTimeUnix = itemSnapshot.val().time;
+					
+					//console.log(itemSnapshot.val());
 					var date = new Date(postTimeUnix * 1000);
 					hours = date.getHours();
 					minutes = "0" + date.getMinutes();
 					seconds = "0" + date.getSeconds();
-				}
 
+
+					document.write(postCount.toString() + ". ");
+					postCount+=1;
+					document.write(titleStr.link(linkUrl));
+					document.write("<br>");
+					document.write(scoreStr + " points by " + byStr.link(baseUserURL + byStr) + " ");
+					document.write(calcTimeDiff(date));
+					document.write(" | " + "comments".link(baseCommentsURL + childSnapshot.val()));
+					document.write("<br>");
+					document.write("<br>");
+				
+			
+				
+				if (itemSnapshot.key() == "kids") {
+					//console.log(itemSnapshot.val());
+					//document.write("kids" + itemSnapshot.val());
+				}
 			});
 		});
 
@@ -68,4 +66,56 @@ function retrieve() {
 	});	
 }
 
+function calcTimeDiff(postDateStamp) {
+	var postDate = postDateStamp.getDate();//day as number, 1-31
+	var postYear = postDateStamp.getFullYear();//four digit year, yyyy
+	var postMonth = postDateStamp.getMonth();//0-11
+	var postHours = postDateStamp.getHours();
+	var postMinutes = postDateStamp.getMinutes();
+	var postSeconds = postDateStamp.getSeconds();
 
+	var currDateStamp = new Date();
+	var currDate = currDateStamp.getDate();//day as number, 1-31
+	var currYear = currDateStamp.getFullYear();
+	var currMonth = currDateStamp.getMonth();
+	var currHours = currDateStamp.getHours();
+	var currMinutes = currDateStamp.getMinutes();
+	var currSeconds = currDateStamp.getSeconds();
+
+
+	if (currYear - postYear == 0) {//same year
+		if (currMonth - postMonth == 0) {//same month
+			if (currDate - postDate == 0) {//same day of month
+				if (currHours - postHours == 0) {//same hour
+					if (currMinutes - postMinutes == 0) {//same minute
+						if (currSeconds - postSeconds == 0) {
+							return ("0 seconds ago");
+						} else {
+							return (currSeconds - postSeconds + " seconds ago");
+						}
+					} else {
+						return (currMinutes - postMinutes + " minutes ago");
+					}
+				} else {
+					if (currHours - postHours == 1) {
+						return (" 1 hour ago");
+					}else {
+						return (currHours - postHours + " hours ago");
+					}
+				}
+
+			} else {
+				if (currDate - postDate==1) {
+					return (" 1 day ago");
+				} else {
+					return (currDate - postDate + " days ago");
+				}
+			}
+		} else {
+			return (currMonth - postMonth + " months ago");
+		}
+	} else {
+		return (currYear - postYear + " years ago");
+	}
+
+}
