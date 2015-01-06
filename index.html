@@ -7,13 +7,15 @@
 	<script src="hackerNight.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
-	<!--img id="navbar" src="mainlogo_orange.png"-->
-	<!--h1>Hacker Night. <a href="https://news.ycombinator.com">Hacker News</a> for the time-aware</h3-->
+	<img id="navbar" src="mainlogo_orange.png">
+	<h1>Hacker Night. <a href="https://news.ycombinator.com">Hacker News</a> for the time-aware</h3>
 </head>
 
 <body>
-	<p id="output-area"></p>
-	<script>retrieve()</script>
+	<div id="output-area">
+		<script>retrieve()</script>
+	</div>
+	<a id="moreButton" onclick="displayNextPosts();" href="javascript:void(0);">More</a>
 </body>
 
 

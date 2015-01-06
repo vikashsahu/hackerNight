@@ -15,8 +15,8 @@ function retrieve() {
 	var seconds;
 	var postCount=1;
 
-	var outputArea = document.getElementById("output-area");
-	
+	//var outputArea = document.getElementById("output-area");
+
 	//item source
 	//"https://hacker-news.firebaseio.com/item/""
 
@@ -35,24 +35,20 @@ function retrieve() {
 					byStr = itemSnapshot.val().by.toString();
 					postTimeUnix = itemSnapshot.val().time;
 					
-					//console.log(itemSnapshot.val());
 					var date = new Date(postTimeUnix * 1000);
 					hours = date.getHours();
 					minutes = "0" + date.getMinutes();
 					seconds = "0" + date.getSeconds();
 
-
-					document.write(postCount.toString() + ". ");
+					document.getElementById("output-area").innerHTML += (postCount.toString() + ". ");
 					postCount+=1;
-					document.write(titleStr.link(linkUrl));
-					document.write("<br>");
-					document.write(scoreStr + " points by " + byStr.link(baseUserURL + byStr) + " ");
-					document.write(calcTimeDiff(date));
-					document.write(" | " + "comments".link(baseCommentsURL + childSnapshot.val()));
-					document.write("<br>");
-					document.write("<br>");
-				
-			
+					document.getElementById("output-area").innerHTML += (titleStr.link(linkUrl));
+					document.getElementById("output-area").innerHTML += '<br>';
+					document.getElementById("output-area").innerHTML += (scoreStr + " points by " + byStr.link(baseUserURL + byStr) + " ");
+					document.getElementById("output-area").innerHTML += calcTimeDiff(date);
+					document.getElementById("output-area").innerHTML += (" | " + "comments".link(baseCommentsURL + childSnapshot.val()));
+					document.getElementById("output-area").innerHTML += '<br>';
+					document.getElementById("output-area").innerHTML += '<br>';
 				
 				if (itemSnapshot.key() == "kids") {
 					//console.log(itemSnapshot.val());
@@ -60,7 +56,6 @@ function retrieve() {
 				}
 			});
 		});
-
 	}, function (errorObject) {
 		console.log("The read failed: " + errorObject.code);
 	});	
