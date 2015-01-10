@@ -1,6 +1,6 @@
 
 
-function retrieve() {
+function retrieve(start, end) {
 	//reference to top stories, version 0 of the HN api
 	var HNRef = new Firebase("https://hacker-news.firebaseio.com/v0/topstories");
 	var baseItemURL = "http://hacker-news.firebaseio.com/v0/item/";
@@ -23,12 +23,15 @@ function retrieve() {
 	HNRef.once("value", function(dataSnapshot) {
 		//dataSnapshot contains IDs of the top 100 stories
 
+		//console.log(dataSnapshot[2]);
+
 		//for each story ID, retrieve corresponding object
 		dataSnapshot.forEach(function(childSnapshot) {
 			//console.log(childSnapshot.val());
 			var itemString = baseItemURL + childSnapshot.val();
 			var ItemRef = new Firebase(itemString);
 			ItemRef.once("value", function(itemSnapshot) {
+				if (postCount >= start && postCount <=end) {
 					titleStr = itemSnapshot.val().title.toString();
 					linkUrl = itemSnapshot.val().url;
 					scoreStr = itemSnapshot.val().score.toString();
@@ -41,7 +44,7 @@ function retrieve() {
 					seconds = "0" + date.getSeconds();
 
 					document.getElementById("output-area").innerHTML += (postCount.toString() + ". ");
-					postCount+=1;
+					//postCount+=1;
 					document.getElementById("output-area").innerHTML += (titleStr.link(linkUrl));
 					document.getElementById("output-area").innerHTML += '<br>';
 					document.getElementById("output-area").innerHTML += (scoreStr + " points by " + byStr.link(baseUserURL + byStr) + " ");
@@ -50,10 +53,13 @@ function retrieve() {
 					document.getElementById("output-area").innerHTML += '<br>';
 					document.getElementById("output-area").innerHTML += '<br>';
 				
-				if (itemSnapshot.key() == "kids") {
-					//console.log(itemSnapshot.val());
-					//document.write("kids" + itemSnapshot.val());
+					if (itemSnapshot.key() == "kids") {
+						//console.log(itemSnapshot.val());
+						//document.write("kids" + itemSnapshot.val());
+					}
 				}
+				postCount+=1;
+					
 			});
 		});
 	}, function (errorObject) {
@@ -93,7 +99,7 @@ function calcTimeDiff(postDateStamp) {
 					}
 				} else {
 					if (currHours - postHours == 1) {
-						return (" 1 hour ago");
+						return (" an hour ago");
 					}else {
 						return (currHours - postHours + " hours ago");
 					}
