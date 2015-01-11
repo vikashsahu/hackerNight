@@ -1,5 +1,4 @@
 
-
 function retrieve(start, end) {
 	//reference to top stories, version 0 of the HN api
 	var HNRef = new Firebase("https://hacker-news.firebaseio.com/v0/topstories");
@@ -14,20 +13,15 @@ function retrieve(start, end) {
 	var minutes;
 	var seconds;
 	var postCount=1;
+	var shortCircuit = false;
 
-	//var outputArea = document.getElementById("output-area");
-
-	//item source
-	//"https://hacker-news.firebaseio.com/item/""
+	//item source: "https://hacker-news.firebaseio.com/item/""
 
 	HNRef.once("value", function(dataSnapshot) {
 		//dataSnapshot contains IDs of the top 100 stories
 
-		//console.log(dataSnapshot[2]);
-
 		//for each story ID, retrieve corresponding object
 		dataSnapshot.forEach(function(childSnapshot) {
-			//console.log(childSnapshot.val());
 			var itemString = baseItemURL + childSnapshot.val();
 			var ItemRef = new Firebase(itemString);
 			ItemRef.once("value", function(itemSnapshot) {
@@ -44,7 +38,6 @@ function retrieve(start, end) {
 					seconds = "0" + date.getSeconds();
 
 					document.getElementById("output-area").innerHTML += (postCount.toString() + ". ");
-					//postCount+=1;
 					document.getElementById("output-area").innerHTML += (titleStr.link(linkUrl));
 					document.getElementById("output-area").innerHTML += '<br>';
 					document.getElementById("output-area").innerHTML += (scoreStr + " points by " + byStr.link(baseUserURL + byStr) + " ");
@@ -53,14 +46,16 @@ function retrieve(start, end) {
 					document.getElementById("output-area").innerHTML += '<br>';
 					document.getElementById("output-area").innerHTML += '<br>';
 				
-					if (itemSnapshot.key() == "kids") {
-						//console.log(itemSnapshot.val());
-						//document.write("kids" + itemSnapshot.val());
-					}
+					if (itemSnapshot.key() == "kids") {}
+					if (postCount == end)
+						shortCircuit=true;
 				}
-				postCount+=1;
-					
+				postCount+=1;					
 			});
+
+			if (shortCircuit)
+				return true;
+
 		});
 	}, function (errorObject) {
 		console.log("The read failed: " + errorObject.code);
@@ -82,7 +77,6 @@ function calcTimeDiff(postDateStamp) {
 	var currHours = currDateStamp.getHours();
 	var currMinutes = currDateStamp.getMinutes();
 	var currSeconds = currDateStamp.getSeconds();
-
 
 	if (currYear - postYear == 0) {//same year
 		if (currMonth - postMonth == 0) {//same month
@@ -119,4 +113,13 @@ function calcTimeDiff(postDateStamp) {
 		return (currYear - postYear + " years ago");
 	}
 
+}
+
+function clock() {
+	var currTime = new Date();
+	var hrs = currTime.getHours();
+	var min = currTime.getMinutes();
+	var sec = currTime.getSeconds();
+
+	document.getElementById("clock-area").innerHTML = hrs + ":" + min + ":" + sec;
 }

@@ -11,7 +11,10 @@
 	<h1>Hacker Night. A time-sensitive <a href="https://news.ycombinator.com">Hacker News</a></h1>
 </head>
 
-<body>
+<body onload = "clock(); setInterval('clock()', 1000)">
+
+	<span id="clock-area"></span>
+
 	<div id="output-area">
 		<script>retrieve(1, 25)</script>
 	</div>
